@@ -40,8 +40,14 @@ class enrol_self_edit_form extends moodleform {
         $mform->addElement('select', 'roleid', get_string('defaultrole', 'role'), $roles);
         $mform->setDefault('roleid', $plugin->get_config('roleid'));
 
-		$mform->addElement('textarea', 'customtext1', get_string('editdescription', 'enrol_apply'));
-	
+        $mform->addElement('advcheckbox', 'customint1', get_string('showquestion1', 'enrol_apply'));
+		$mform->addElement('textarea', 'customtext1', get_string('q1', 'enrol_apply'));
+
+        $mform->addElement('advcheckbox', 'customint2', get_string('showquestion2', 'enrol_apply'));
+        $mform->addElement('textarea', 'customtext2', get_string('q2', 'enrol_apply'));
+
+        //$mform->addElement('advcheckbox', 'customint3', get_string('mailfromteacher', 'enrol_apply'));
+        //$mform->addHelpButton('customint3', 'mailfromteacher', 'enrol_apply');
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);

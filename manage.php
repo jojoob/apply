@@ -56,7 +56,7 @@ foreach ( $enrols as $enrol ) {
 	echo '<td>' . date ( "Y-m-d", $enrol->timecreated ) . '</td></tr>';
 }
 echo '</table>';
-echo '<p align="center"><input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confrim\');">&nbsp;&nbsp;<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');"></p>';
+echo '<p align="center"><input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confirm\');">&nbsp;&nbsp;<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');"></p>';
 echo '</form>';
 echo '<script>function doSubmit(type){if(type=="cancel"){document.getElementById("type").value=type;}document.getElementById("frmenrol").submit();}</script>';
 echo $OUTPUT->footer ();

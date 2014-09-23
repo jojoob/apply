@@ -46,29 +46,47 @@ if (isset ( $_POST ['enrolid'] )) {
 
 $enrols = getAllEnrolment ($id);
 
+//get the record of this enrol instance in order to check if the questions are set
+$enrol_instance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'apply', 'id'=>$_GET ['enrolid']), '*', MUST_EXIST);
+
 echo $OUTPUT->header ();
 echo $OUTPUT->heading ( get_string ( 'confirmusers', 'enrol_apply' ) );
 echo '<form id="frmenrol" method="post" action="apply.php?id=' . $id . '&enrolid=' . $_GET ['enrolid'] . '">';
 echo '<input type="hidden" id="type" name="type" value="confirm">';
-echo '<table class="generalbox editcourse boxaligncenter"><tr class="header">';
-echo '<th class="header" scope="col">&nbsp;</th>';
-echo '<th class="header" scope="col">' . get_string ( 'coursename', 'enrol_apply' ) . '</th>';
-echo '<th class="header" scope="col">&nbsp;</th>';
-echo '<th class="header" scope="col">' . get_string ( 'applyuser', 'enrol_apply' ) . '</th>';
-echo '<th class="header" scope="col">' . get_string ( 'applyusermail', 'enrol_apply' ) . '</th>';
-echo '<th class="header" scope="col">' . get_string ( 'applydate', 'enrol_apply' ) . '</th>';
+
+echo '<table style="width: 100%; font-size: small;margin-bottom: 2em;" class="generalbox editcourse boxalignleft">';
+echo '<tr class="header">';
+echo '<th  style="width: auto" scope="col">&nbsp;</th>';
+echo '<th  style="width: auto" scope="col">' . get_string ( 'applyuser', 'enrol_apply' ) . '</th>';
+echo '<th  style="width: auto" scope="col">' . get_string ( 'applydate', 'enrol_apply' ) . '</th>';
+
+//If the questions are set in the settings, the col will be displayed
+if ($enrol_instance->customint1 == 1){
+    echo '<th  style="width: 35%" scope="col">' . get_string ( 'q1', 'enrol_apply' ) . '</th>';
+}
+if ($enrol_instance->customint2 == 1){
+    echo '<th  style="width: 35%" scope="col">' . get_string ( 'q2', 'enrol_apply' ) . '</th>';
+}
+
 echo '</tr>';
 foreach ( $enrols as $enrol ) {
 	$picture = get_user_picture($enrol->userid);
-	echo '<tr><td><input type="checkbox" name="enrolid[]" value="' . $enrol->id . '"></td>';
-	echo '<td>' . $enrol->course . '</td>';
-	echo '<td>' . $OUTPUT->render($picture) . '</td>';
-	echo '<td>'.$enrol->firstname . ' ' . $enrol->lastname.'</td>';
-	echo '<td>' . $enrol->email . '</td>';
-	echo '<td>' . date ( "Y-m-d", $enrol->timecreated ) . '</td></tr>';
+	echo '<tr style="vertical-align: top;">';
+    echo '<td><input type="checkbox" name="enrolid[]" value="' . $enrol->id . '"></td>';
+	echo '<td>' . $OUTPUT->render($picture) .' '. $enrol->firstname . ' ' . $enrol->lastname .'<br /><br />'. $enrol->email .'</td>';
+    echo '<td>' . date ( "Y-m-d", $enrol->timecreated ) . '</td>';
+
+    //If the questions are set in the settings, the col will be displayed
+    if ($enrol_instance->customint1 == 1){
+        echo '<td>' . $enrol->q1 . '</td>';
+    }
+    if ($enrol_instance->customint2 == 1){
+        echo '<td>' . $enrol->q2 . '</td>';
+    }
+	echo '</tr>';
 }
 echo '</table>';
-echo '<p align="center"><input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confrim\');">&nbsp;&nbsp;<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');"></p>';
+echo '<p><input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confirm\');">&nbsp;&nbsp;<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');"><input type="button" onclick="history.back();" value="'. get_string ( 'back' ) . '"></p>';
 echo '</form>';
 echo '<script>function doSubmit(type){if(type=="cancel"){document.getElementById("type").value=type;}document.getElementById("frmenrol").submit();}</script>';
 echo $OUTPUT->footer ();

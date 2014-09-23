@@ -26,9 +26,9 @@ $string['confirmusers'] = 'Enrol Confirm';
 $string['coursename'] = 'Course';
 $string['applyuser'] = 'First name / Surname';
 $string['applyusermail'] = 'Email';
-$string['applydate'] = 'Enrol date';
-$string['btnconfirm'] = 'Confirm';
-$string['btncancel'] = 'Cancel';
+$string['applydate'] = 'Date';
+$string['btnconfirm'] = 'Confirm enrolment for maked users';
+$string['btncancel'] = 'Cancel enrolment for maked users';
 $string['enrolusers'] = 'Enrol users';
 
 $string['status'] = 'Allow Course enrol confirmation';
@@ -39,13 +39,27 @@ $string['apply:manage'] = 'Manage apply enrolment';
 $string['apply:unenrol'] = 'Cancel users from course';
 $string['apply:unenrolapply'] = 'Cancel self from the course';
  
-$string['notification'] = '<b>Enrollment Application successfully sent</b>. <br/><br/>You will be informed by email as soon as your enrollment has been confirmed. If you want to enroll to other courses, please click "course catalogue" in the top menu.';
+$string['notification'] = '<b>Enrollment Application successfully sent</b>. <br/><br/>You will be informed by email as soon as your enrollment has been confirmed.';
 
 $string['sendmailtoteacher'] = 'Send email notification to teachers';
-$string['mailtoteacher_suject'] = 'New Enrollment request!';
-$string['editdescription'] = 'Textarea description';
+$string['mailtoteacher_suject'] = 'Moodle: New Enrollment request!';
+$string['mailfromteacher'] = 'Teacher as mail sender';
 $string['applymanage'] = 'Manage enrolment applications';
 
 $string['status_desc'] = 'Allow course access of internally enrolled users.';
+
+$string['enrolme'] = 'Apply for this course';
+
+$string['q1'] = 'Question 1';
+$string['showquestion1'] ='Show question 1';
+$string['q2'] = 'Question 2';
+$string['showquestion2'] ='Show question 2';
+
+$string['status_help'] = 'If you want to enable the approved course enrolment, choose YES.';
+$string['mailfromteacher_help'] = 'Students get an email after approval or cancellation. Normally they get this mail from the Moodle admin. When you set the checkbox, the students will get these mails from you as the sender. ';
+
+$string['course'] ='Course';
+$string['directlink'] ='Direct link to enrolment:';
+
 
 ?>

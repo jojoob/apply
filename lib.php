@@ -19,7 +19,8 @@ class enrol_apply_plugin extends enrol_plugin {
 	public function add_default_instance($course) {
 		$fields = array(
 		    'status'          => $this->get_config('status'),
-		    'roleid'          => $this->get_config('roleid', 0)
+		    'roleid'          => $this->get_config('roleid', 0),
+            'motivation'      => $this->get_config('motivation')
 		);
 		return $this->add_instance($course, $fields);
 	}
@@ -92,8 +93,21 @@ class enrol_apply_plugin extends enrol_plugin {
 					$roleid = $role->id;
 				}
 
-				$this->enrol_user($instance, $USER->id, $roleid, $timestart, $timeend,1);
-				sendConfirmMailToTeachers($instance->courseid,$data->applydescription);
+                $this->enrol_user($instance, $USER->id, $roleid, $timestart, $timeend,1);
+                $enrolid=$instance->id;
+                //get id of enrolment table
+                $enrolnumber = $DB->get_record_sql("select id from ".$CFG->prefix."user_enrolments where enrolid='".$enrolid."' and userid='".$USER->id."'");
+
+                //write motivation and other addiontion information into mdl_enrol_apply
+                $apply_record = new stdClass();
+                $apply_record->enrolid = $enrolnumber->id;
+                $apply_record->q1 = $data->question1;
+                $apply_record->q2 = $data->question2;
+                //print_r($apply_record);
+                $DB->insert_record('enrol_apply', $apply_record, false);
+
+                //Send mail to teacher
+				sendConfirmMailToTeachers($instance->courseid, $data->question1, $data->question2, $enrolid);
 				
 				add_to_log($instance->courseid, 'course', 'enrol', '../enrol/users.php?id='.$instance->courseid, $instance->courseid); //there should be userid somewhere!
 				redirect("$CFG->wwwroot/course/view.php?id=$instance->courseid");
@@ -118,7 +132,7 @@ class enrol_apply_plugin extends enrol_plugin {
 
 		$icons = array();
 
-		if (has_capability('enrol/manual:config', $context)) {
+		if (has_capability('enrol/manual:manage', $context)) {
             $editlink = new moodle_url("/enrol/apply/edit.php", array('courseid'=>$instance->courseid, 'id'=>$instance->id));
             $icons[] = $OUTPUT->action_icon($editlink, new pix_icon('t/edit', get_string('edit'), 'core', array('class' => 'iconsmall')));
         }
@@ -158,9 +172,9 @@ function getAllEnrolment($id = null){
 	global $DB;
 	global $CFG;
 	if($id){
-		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1 and e.courseid='.$id);
+		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1 and e.courseid='.$id);
 	}else{
-		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1');
+		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1');
 	}
 	return $userenrolments;
 }
@@ -200,28 +214,34 @@ function cancelEnrolment($enrols){
 function sendCancelMail($info){
 	global $DB;
 	global $CFG;
+    //global $USER;
 	$apply_setting = $DB->get_records_sql("select name,value from ".$CFG->prefix."config_plugins where plugin='enrol_apply'");
 
 	$replace = array('firstname'=>$info->firstname,'content'=>$info->coursename);
 	$body = $apply_setting['cancelmailcontent']->value;
 	$body = updateMailContent($body,$replace);
-	$contact = get_admin();
-	email_to_user($info, $contact, $apply_setting['cancelmailsubject']->value, '', $body);
+    $contact = get_admin();
+    //confirm mail will sent by the admin
+    //$contact = $USER;
+	email_to_user($info, $contact, $apply_setting['cancelmailsubject']->value, '', $body,", ", true);
 }
 
 function sendConfirmMail($info){
 	global $DB;
 	global $CFG;
+    //global $USER;
 	$apply_setting = $DB->get_records_sql("select name,value from ".$CFG->prefix."config_plugins where plugin='enrol_apply'");
 
 	$replace = array('firstname'=>$info->firstname,'content'=>$info->coursename);
 	$body = $apply_setting['confirmmailcontent']->value;
 	$body = updateMailContent($body,$replace);
 	$contact = get_admin();
+    //confirm mail will sent by the admin
+    //$contact = $USER;
 	email_to_user($info, $contact, $apply_setting['confirmmailsubject']->value, '', $body);
 }
 
-function sendConfirmMailToTeachers($courseid,$desc){
+function sendConfirmMailToTeachers($courseid,$q1,$q2,$enrolid){
 	global $DB;
 	global $CFG;
 	global $USER;
@@ -230,12 +250,23 @@ function sendConfirmMailToTeachers($courseid,$desc){
 	if($apply_setting['sendmailtoteacher']->value == 1){
 		$course = $DB->get_record('course',array('id'=>$courseid));
 		$context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+
+        //generate the link to the enrolment of the course
+        $link="$CFG->wwwroot/enrol/apply/apply.php?id=" . $courseid . "&enrolid=" . $enrolid;
+        $course_txt=get_string('course', 'enrol_apply');
+        $q1_txt=get_string('q1', 'enrol_apply');
+        $q2_txt=get_string('q2', 'enrol_apply');
+        $link_enrol=get_string('directlink', 'enrol_apply');
+        $link_txt='<a href="'.$link.'">'.$link.'</a>';
+
 		$teacherType = $DB->get_record('role',array("shortname"=>"editingteacher"));
 		$teachers = $DB->get_records('role_assignments', array('contextid'=>$context->id,'roleid'=>$teacherType->id));
 		foreach($teachers as $teacher){
 			$editTeacher = $DB->get_record('user',array('id'=>$teacher->userid));
-			$body = '<p>Course: '.$course->fullname.'</p><p>First name: '.$USER->firstname.'</p><p>Last name: '.$USER->lastname.'</p><p>Information: '.$desc.'</p>';
-			$contact = get_admin();
+			$body = '<p>'.$course_txt.": ".$course->fullname.'</p><p>'.$USER->firstname.' '.$USER->lastname.'</p><p><b>'.$q1_txt.'</b></p><p>'.$q1.'</p><p/><p><b>'.$q2_txt.'</b></p><p>'.$q2.'</p><p /><p>'.$link_enrol." ".$link_txt.'</p>';
+			//$contact = get_admin();
+            //the teacher get the mail be the user and can answer if he/she wants
+            $contact = $USER;
 			$info = $editTeacher;
 			$info->coursename = $course->fullname;
 			email_to_user($info, $contact, get_string('mailtoteacher_suject', 'enrol_apply'), '', $body);

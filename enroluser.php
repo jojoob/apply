@@ -103,6 +103,7 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
                 $timeend = $timestart + $extendperiod;
             }
             //echo "<pre>";print_r($instance);exit();
+            print_r($enrol_manual);
             $enrol_manual->enrol_user($instance, $adduser->id, $roleid, $timestart, $timeend);
             add_to_log($course->id, 'course', 'enrol', '../enrol/users.php?id='.$course->id, $course->id); //there should be userid somewhere!
         }

@@ -52,9 +52,16 @@ class enrol_apply_enrol_form extends moodleform {
             // nothing?
         }
 
-		$mform->addElement('html', '<p>'.$instance->customtext1.'</p>');
-		$mform->addElement('textarea', 'applydescription','','cols="80"');
-        $this->add_action_buttons(false, get_string('enrolme', 'enrol_self'));
+        if ($instance->customint1 == 1){
+            //$mform->addElement('html', '<div style="font-weight:bold">'.$instance->customtext1.'</div>');
+            $mform->addElement('textarea', 'question1',$instance->customtext1,'');
+        }
+        if ($instance->customint2 == 1){
+            //$mform->addElement('html', '<div style="font-weight:bold">'.$instance->customtext2.'</div>');
+            $mform->addElement('textarea', 'question2',$instance->customtext2,'');
+        }
+
+        $this->add_action_buttons(false, get_string('enrolme', 'enrol_apply'));
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
