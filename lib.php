@@ -166,6 +166,27 @@ class enrol_apply_plugin extends enrol_plugin {
 		}
 		return $actions;
 	}
+
+	/**
+	 * Returns enrolment instance manage link.
+	 *
+	 * By defaults looks for manage.php file and tests for manage capability.
+	 *
+	 * @param navigation_node $instancesnode
+	 * @param stdClass $instance
+	 * @return moodle_url;
+	 */
+	public function add_course_navigation($instancesnode, stdClass $instance) {
+	    if ($instance->enrol !== 'apply') {
+	         throw new coding_exception('Invalid enrol instance type!');
+	    }
+
+	    $context = context_course::instance($instance->courseid);
+	    if (has_capability('enrol/apply:config', $context)) {
+	        $managelink = new moodle_url('/enrol/apply/edit.php', array('courseid'=>$instance->courseid, 'id'=>$instance->id));
+	        $instancesnode->add($this->get_instance_name($instance), $managelink, navigation_node::TYPE_SETTING);
+	    }
+	}
 }
 
 function getAllEnrolment($id = null){
