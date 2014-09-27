@@ -49,6 +49,8 @@ class enrol_self_edit_form extends moodleform {
         //$mform->addElement('advcheckbox', 'customint3', get_string('mailfromteacher', 'enrol_apply'));
         //$mform->addHelpButton('customint3', 'mailfromteacher', 'enrol_apply');
 
+        $mform->addElement('advcheckbox', 'sendmailtoteacher', get_string('sendmailtoteacher', 'enrol_apply'));
+
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'courseid');

@@ -20,6 +20,7 @@ class enrol_apply_plugin extends enrol_plugin {
 		$fields = array(
 		    'status'          => $this->get_config('status'),
 		    'roleid'          => $this->get_config('roleid', 0),
+		    'sendmailtoteacher' => $this->get_config('sendmailtoteacher', 1),
             'motivation'      => $this->get_config('motivation')
 		);
 		return $this->add_instance($course, $fields);
@@ -106,8 +107,13 @@ class enrol_apply_plugin extends enrol_plugin {
                 //print_r($apply_record);
                 $DB->insert_record('enrol_apply', $apply_record, false);
 
-                //Send mail to teacher
-				sendConfirmMailToTeachers($instance->courseid, $data->question1, $data->question2, $enrolid);
+                // Johannes: Abfrage hinzugefügt (Einstellung nun Kursbasiert)
+                error_log("pre mail");
+                if ($instance->sendmailtoteacher == 1) {
+                	error_log("mail sending");
+                	//Send mail to teacher
+                	sendConfirmMailToTeachers($instance->courseid, $data->question1, $data->question2, $enrolid);
+                }
 				
 				add_to_log($instance->courseid, 'course', 'enrol', '../enrol/users.php?id='.$instance->courseid, $instance->courseid); //there should be userid somewhere!
 				redirect("$CFG->wwwroot/course/view.php?id=$instance->courseid");
@@ -268,7 +274,9 @@ function sendConfirmMailToTeachers($courseid,$q1,$q2,$enrolid){
 	global $USER;
 	$apply_setting = $DB->get_records_sql("select name,value from ".$CFG->prefix."config_plugins where plugin='enrol_apply'");
 	
-	if($apply_setting['sendmailtoteacher']->value == 1){
+	// Johannes: Abfrage auskommentiert, da globale option für sendmailtoteacher entfernt
+	// Abfrage nun vor Funktionsaufruf
+	// if($apply_setting['sendmailtoteacher']->value == 1){
 		$course = $DB->get_record('course',array('id'=>$courseid));
 		$context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
 
@@ -292,7 +300,7 @@ function sendConfirmMailToTeachers($courseid,$q1,$q2,$enrolid){
 			$info->coursename = $course->fullname;
 			email_to_user($info, $contact, get_string('mailtoteacher_suject', 'enrol_apply'), '', $body);
 		}
-	}
+	// }
 }
 
 function getRelatedInfo($enrolid){
