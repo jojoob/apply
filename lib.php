@@ -20,7 +20,7 @@ class enrol_apply_plugin extends enrol_plugin {
 		$fields = array(
 		    'status'          => $this->get_config('status'),
 		    'roleid'          => $this->get_config('roleid', 0),
-		    'sendmailtoteacher' => $this->get_config('sendmailtoteacher', 1),
+		    // 'sendmailtoteacher' => $this->get_config('sendmailtoteacher', 1),
             'motivation'      => $this->get_config('motivation')
 		);
 		return $this->add_instance($course, $fields);
@@ -108,9 +108,7 @@ class enrol_apply_plugin extends enrol_plugin {
                 $DB->insert_record('enrol_apply', $apply_record, false);
 
                 // Johannes: Abfrage hinzugefügt (Einstellung nun Kursbasiert)
-                error_log("pre mail");
-                if ($instance->sendmailtoteacher == 1) {
-                	error_log("mail sending");
+                if ($instance->customint4 == 1) {
                 	//Send mail to teacher
                 	sendConfirmMailToTeachers($instance->courseid, $data->question1, $data->question2, $enrolid);
                 }

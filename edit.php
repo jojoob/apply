@@ -52,7 +52,7 @@ if ($mform->is_cancelled()) {
     if ($instance->id) {
         $instance->status         = $data->status;
         $instance->name           = $data->name;
-        $instance->sendmailtoteacher = $data->sendmailtoteacher;
+        $instance->customint4 = $data->customint4;
         $instance->customtext1    = $data->customtext1;
         $instance->customint1     = $data->customint1;
         $instance->customtext2    = $data->customtext2;
@@ -67,7 +67,7 @@ if ($mform->is_cancelled()) {
             'status'          =>$data->status,
             'name'            =>$data->name,
             'roleid'          =>$data->roleid,
-            'sendmailtoteacher' =>$data->sendmailtoteacher,
+            'customint4' =>$data->customint4,
             'customtext1'     =>$data->customtext1,
             'customint1'      =>$data->customint1,
             'customtext2'     =>$data->customtext2,
