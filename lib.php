@@ -20,7 +20,7 @@ class enrol_apply_plugin extends enrol_plugin {
 		$fields = array(
 		    'status'          => $this->get_config('status'),
 		    'roleid'          => $this->get_config('roleid', 0),
-		    // 'sendmailtoteacher' => $this->get_config('sendmailtoteacher', 1),
+		    'customint4'      => 1,
             'motivation'      => $this->get_config('motivation')
 		);
 		return $this->add_instance($course, $fields);

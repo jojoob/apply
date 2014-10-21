@@ -41,6 +41,7 @@ if ($instanceid) {
     $instance = new stdClass();
     $instance->id       = null;
     $instance->courseid = $course->id;
+    $instance->customint4 = 1;
 }
 
 $mform = new enrol_self_edit_form(NULL, array($instance, $plugin, $context));
@@ -67,7 +68,7 @@ if ($mform->is_cancelled()) {
             'status'          =>$data->status,
             'name'            =>$data->name,
             'roleid'          =>$data->roleid,
-            'customint4' =>$data->customint4,
+            'customint4'      =>$data->customint4,
             'customtext1'     =>$data->customtext1,
             'customint1'      =>$data->customint1,
             'customtext2'     =>$data->customtext2,
