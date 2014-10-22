@@ -197,9 +197,9 @@ function getAllEnrolment($id = null){
 	global $DB;
 	global $CFG;
 	if($id){
-		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1 and e.courseid='.$id);
+		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,ue.status,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status!=0 and e.courseid='.$id);
 	}else{
-		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status=1');
+		$userenrolments = $DB->get_records_sql('select ue.userid,ue.id,ue.status,u.firstname,u.lastname,u.email,u.picture,c.fullname as course,ue.timecreated,ea.q1,ea.q2 from '.$CFG->prefix.'user_enrolments as ue left join '.$CFG->prefix.'user as u on ue.userid=u.id left join '.$CFG->prefix.'enrol_apply as ea on ue.id=ea.enrolid left join '.$CFG->prefix.'enrol as e on ue.enrolid=e.id left join '.$CFG->prefix.'course as c on e.courseid=c.id where ue.status!=0');
 	}
 	return $userenrolments;
 }
@@ -222,6 +222,20 @@ function confirmEnrolment($enrols){
 			$DB->insert_record('role_assignments',$roleAssignments);
 			$info = getRelatedInfo($enrol);
 			sendConfirmMail($info);
+		}
+	}
+}
+
+function waitEnrolment($enrols){
+	global $DB;
+	global $CFG;
+	foreach ($enrols as $enrol){
+		@$enroluser->id = $enrol;
+		@$enroluser->status = 2;
+
+		if($DB->update_record('user_enrolments',$enroluser)){
+			$info = getRelatedInfo($enrol);
+			sendWaitMail($info);
 		}
 	}
 }
@@ -264,6 +278,21 @@ function sendConfirmMail($info){
     //confirm mail will sent by the admin
     //$contact = $USER;
 	email_to_user($info, $contact, $apply_setting['confirmmailsubject']->value, '', $body);
+}
+
+function sendWaitMail($info){
+	global $DB;
+	global $CFG;
+    //global $USER;
+	$apply_setting = $DB->get_records_sql("select name,value from ".$CFG->prefix."config_plugins where plugin='enrol_apply'");
+
+	$replace = array('firstname'=>$info->firstname,'content'=>$info->coursename);
+	$body = $apply_setting['waitmailcontent']->value;
+	$body = updateMailContent($body,$replace);
+	$contact = get_admin();
+    //confirm mail will sent by the admin
+    //$contact = $USER;
+	email_to_user($info, $contact, $apply_setting['waitmailsubject']->value, '', $body);
 }
 
 function sendConfirmMailToTeachers($courseid,$q1,$q2,$enrolid){
