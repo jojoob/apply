@@ -37,6 +37,8 @@ if (isset ( $_POST ['enrolid'] )) {
 	if ($_POST ['enrolid']) {
 		if ($_POST ['type'] == 'confirm') {
 			confirmEnrolment ( $_POST ['enrolid'] );
+		} elseif ($_POST ['type'] == 'wait') {
+			waitEnrolment ( $_POST ['enrolid'] );
 		} elseif ($_POST ['type'] == 'cancel') {
 			cancelEnrolment ( $_POST ['enrolid'] );
 		}
@@ -51,6 +53,7 @@ $enrol_instance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol
 
 echo $OUTPUT->header ();
 echo $OUTPUT->heading ( get_string ( 'confirmusers', 'enrol_apply' ) );
+echo get_string('confirmusers_desc', 'enrol_apply');
 echo '<form id="frmenrol" method="post" action="apply.php?id=' . $id . '&enrolid=' . $_GET ['enrolid'] . '">';
 echo '<input type="hidden" id="type" name="type" value="confirm">';
 
@@ -71,7 +74,11 @@ if ($enrol_instance->customint2 == 1){
 echo '</tr>';
 foreach ( $enrols as $enrol ) {
 	$picture = get_user_picture($enrol->userid);
-	echo '<tr style="vertical-align: top;">';
+	if ($enrol->status == 2) {
+		echo '<tr style="vertical-align: top; background-color: #ccc;">';
+	} else {
+		echo '<tr style="vertical-align: top;">';
+	}
     echo '<td><input type="checkbox" name="enrolid[]" value="' . $enrol->id . '"></td>';
 	echo '<td>' . $OUTPUT->render($picture) .' '. $enrol->firstname . ' ' . $enrol->lastname .'<br /><br />'. $enrol->email .'</td>';
     echo '<td>' . date ( "Y-m-d", $enrol->timecreated ) . '</td>';
@@ -86,9 +93,17 @@ foreach ( $enrols as $enrol ) {
 	echo '</tr>';
 }
 echo '</table>';
-echo '<p><input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confirm\');">&nbsp;&nbsp;<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');"><input type="button" onclick="history.back();" value="'. get_string ( 'back' ) . '"></p>';
+echo '<p>';
+echo '<input type="button" value="' . get_string ( 'btnconfirm', 'enrol_apply' ) . '" onclick="doSubmit(\'confirm\');">';
+echo '<input type="button" value="' . get_string ( 'btnwait', 'enrol_apply' ) . '" onclick="doSubmit(\'wait\');">';
+echo '<input type="button" value="' . get_string ( 'btncancel', 'enrol_apply' ) . '" onclick="doSubmit(\'cancel\');">';
+echo '<input type="button" onclick="history.back();" value="'. get_string ( 'back' ) . '">';
+echo '</p>';
 echo '</form>';
-echo '<script>function doSubmit(type){if(type=="cancel"){document.getElementById("type").value=type;}document.getElementById("frmenrol").submit();}</script>';
+echo '<script>function doSubmit(type){
+	document.getElementById("type").value=type;
+	document.getElementById("frmenrol").submit();
+}</script>';
 echo $OUTPUT->footer ();
 
 

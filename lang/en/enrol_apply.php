@@ -16,18 +16,23 @@ $string['pluginname_desc'] = 'With this plugin users can apply to a course and a
 
 $string['confirmmailsubject'] = 'Confirm mail subject';
 $string['confirmmailcontent'] = 'Confirm mail content';
+$string['waitmailsubject'] = 'Waiting list mail subject';
+$string['waitmailcontent'] = 'Waiting list mail content';
 $string['cancelmailsubject'] = 'Cancel mail subject';
 $string['cancelmailcontent'] = 'Cancel mail sontent';
 $string['confirmmailcontent_desc'] = 'Please use special marks designated email content replaced.<br>{firstname}:Registration name; {content}:Course name';
+$string['waitmailcontent_desc'] = 'Please use special marks designated email content replaced.<br>{firstname}:Registration name; {content}:Course name';
 $string['cancelmailcontent_desc'] = 'Please use special marks designated email content replaced.<br>{firstname}:Registration name; {content}:Course name';
 
 $string['confirmusers'] = 'Enrol Confirm';
+$string['confirmusers_desc'] = 'Users in gray colored rows are on the waiting list.';
 
 $string['coursename'] = 'Course';
 $string['applyuser'] = 'First name / Surname';
 $string['applyusermail'] = 'Email';
 $string['applydate'] = 'Date';
 $string['btnconfirm'] = 'Confirm enrolment for maked users';
+$string['btnwait'] = 'put marked users on waiting list';
 $string['btncancel'] = 'Cancel enrolment for maked users';
 $string['enrolusers'] = 'Enrol users';
 
