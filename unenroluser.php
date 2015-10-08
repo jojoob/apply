@@ -49,8 +49,8 @@ if ($course->id == SITEID) {
 
 // Obviously
 require_login($course);
-// Make sure the user can unenrol self enrolled users.
-require_capability("enrol/self:unenrol", get_context_instance(CONTEXT_COURSE, $course->id));
+// Make sure the user can unenrol users.
+require_capability("enrol/apply:unenrol", get_context_instance(CONTEXT_COURSE, $course->id));
 
 // Get the enrolment manager for this course
 $manager = new course_enrolment_manager($PAGE, $course, $filter);
